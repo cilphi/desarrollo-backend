@@ -130,7 +130,7 @@ http://localhost:8080/carts
 Para añadir productos a un carro: 
 - URL:
 ```
-http://localhost:8080/carts/f3d1b6a4-8e52-4c9e-9a27-6e0b5f8d92a7/f7e1b9c3-2a8d-4c4f-9e71-6d0a1b3c8f33
+http://localhost:8080/carts/f3d1b6a4-8e52-4c9e-9a27-6e0b5f8d92a7/product/f7e1b9c3-2a8d-4c4f-9e71-6d0a1b3c8f33
 ```
 - Consola:
 ```bash 
