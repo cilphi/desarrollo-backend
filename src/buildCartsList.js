@@ -11,7 +11,7 @@ const carts = [
                 },
                 {
                     product: "a4d2c8f1-7b2e-4e6a-8c91-0f3b2e1d9a22",
-                    stock: 4
+                    quantity: 4
                 },
             ]
     },
