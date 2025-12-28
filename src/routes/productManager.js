@@ -6,13 +6,14 @@ export class ProductManager {
     constructor(filePath) {
         this.filePath = filePath;
     }
-
-    async #writeProducts () {
+    //Escribir en el archivo de productos
+    async #writeProducts (products) {
         try {
-            await fsPromises.writeFile(this.filePath, JSON.stringify(products), 'utf-8');
+            await fsPromises.writeFile(this.filePath, JSON.stringify(products, null, 2), 'utf-8');
             console.log('El archivo con los productos fue creado con éxito.');
         } catch (error) {
             console.error('Error al crear el archivo de productos:', error);
+            throw error;
         }
     }
 
@@ -20,11 +21,14 @@ export class ProductManager {
     async getProducts() {
         try {
             const data = await fsPromises.readFile(this.filePath, 'utf-8');
-            const parsed = JSON.parse(data, null, 2);
+            if (!data) return [];
+            const parsed = JSON.parse(data);
             console.log('Productos cargados desde el archivo:', parsed);
             return parsed;
         } catch (error) {
+            if (error.code === 'ENOENT') return [];
             console.error('Error al leer el archivo de productos:', error);
+            throw error;
         }
     }
     
@@ -49,14 +53,16 @@ export class ProductManager {
             if (exists) {
                 console.log('Error: Ya existe un producto con el código:', newProduct.code);
                 return null;
-            };
+            }
             const id = crypto.randomUUID();
-            products.push({id, ...newProduct});
-            await this.#writeProducts(products, JSON.stringify(products, null, 2), 'utf-8');
-            console.log('Nuevo producto agregado con éxito:', newProduct);
-            return {id, ...newProduct};
+            const productToSave = { id, ...newProduct };
+            products.push(productToSave);
+            await this.#writeProducts(products);
+            console.log('Nuevo producto agregado con éxito:', productToSave);
+            return productToSave;
         } catch (error) {
             console.error('Error al agregar el nuevo producto:', error);
+            throw error;
         }
     }
     
@@ -73,10 +79,13 @@ export class ProductManager {
                 if (item.id === id) return {...item, ...updatedFields};
                 return item;
             });
-            await this.#writeProducts(updatedProduct, JSON.stringify(updatedProduct, null, 2), 'utf-8');
-            console.log('Producto actualizado con éxito:', updatedProduct.find(item => item.id === id));
+            await this.#writeProducts(updatedProduct);
+            const updated = updatedProduct.find(item => item.id === id);
+            console.log('Producto actualizado con éxito:', updated);
+            return updated;
         } catch (error) {
             console.error('Error al actualizar el producto:', error);
+            throw error;
         }
     }
     
@@ -90,10 +99,12 @@ export class ProductManager {
                 return null;
             };
             const deletedProducts = products.filter(item => item.id !== id);
-            await this.#writeProducts(deletedProducts, JSON.stringify(deletedProducts, null, 2), 'utf-8');
+            await this.#writeProducts(deletedProducts);
             console.log('Producto eliminado con éxito.');
+            return true;
         } catch (error) {
             console.error('Error al eliminar el producto:', error);
+            throw error;
         }
     }
 }
