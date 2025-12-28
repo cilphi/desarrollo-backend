@@ -100,6 +100,7 @@ Para añadir un carro:
 http://localhost:8080/carts
 ```
 - Consola:
+**Si lo haces antes de eliminar un producto:**
 ```bash 
 {
     "products"[
@@ -110,19 +111,35 @@ http://localhost:8080/carts
     ]
 }
 ```
+
+- Consola:
+**Si lo haces después de eliminar y actualizar un producto:**
+```bash 
+{
+    "products"[
+        {
+            "product": "f7e1b9c3-2a8d-4c4f-9e71-6d0a1b3c8f33",
+            "quantity": 1
+        }
+    ]
+}
+```
+
 ### Llenar Carro
 
 Para añadir productos a un carro: 
 - URL:
 ```
-http://localhost:8080/carts/f3d1b6a4-8e52-4c9e-9a27-6e0b5f8d92a7
+http://localhost:8080/carts/f3d1b6a4-8e52-4c9e-9a27-6e0b5f8d92a7/f7e1b9c3-2a8d-4c4f-9e71-6d0a1b3c8f33
 ```
 - Consola:
 ```bash 
-{
-    "product": "f7e1b9c3-2a8d-4c4f-9e71-6d0a1b3c8f33",
-    "quantity": 5
-}
+[
+    {
+        "product": "f7e1b9c3-2a8d-4c4f-9e71-6d0a1b3c8f33",
+        "quantity": 5
+    }
+]
 ```
 
 ## Método PUT
