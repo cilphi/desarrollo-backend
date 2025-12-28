@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import {promises as fsPromises} from 'fs'
+import { ProductManager } from './productManager.js';
 
 //Clase CartManager
 export class CartManager {
@@ -7,7 +8,7 @@ export class CartManager {
         this.filePath = filePath;
     }
     //Escribir en el archivo de carritos
-    async #writeCart () {
+    async #writeCart (carts) {
         try {
             await fsPromises.writeFile(this.filePath, JSON.stringify(carts, null, 2), 'utf-8');
             console.log('El archivo con los carritos fue creado con éxito.');
@@ -56,10 +57,14 @@ export class CartManager {
                 console.log('Error: Ya existe un producto con el ID:', newCart.id);
                 return null;
             }
-            }
+            }            
+            //Uso de Product Manager
+            const pm = new ProductManager("products.json");
+            const products = await pm.getProducts();
+            if (!products.find(p => p.id === product)) return "El producto que quieres añadir no existe, por favor verifica el ID";
             const id = crypto.randomUUID();
-            cart.push({id, ...newCart});
-            await this.#writeCart(cart, JSON.stringify(cart, null, 2), 'utf-8');
+            carts.push({id, ...newCart});
+            await this.#writeCart(carts, JSON.stringify(carts, null, 2), 'utf-8');
             console.log('Nuevo producto agregado con éxito:', newCart);
             return {id, ...newCart};
         } catch (error) {
@@ -68,26 +73,23 @@ export class CartManager {
     }
 
     //Agregar un ID y cantidad de producto al carrito
-    async addProductToCart (id, quantity) {
+    async addProductToCart (cartId, {product, quantity}) {
         try {
-            const cartProducts = await this.getCart();
-            const exists = cartProducts.some(item => item.id === id);
-            if (!exists) {
-                console.log('Error: Este carro no ha sido creado aún:', id);
+            const carts = await this.getCart();
+            const cart = carts.find(c => c.id === cartId);
+            if (!cart) {
+                console.log('Error: Este carro no ha sido creado aún:', cartId);
                 return "Carro no existe";
             };
-            const productId = productId.find('products.json', id);
-            if (!productId) {
-                console.log('Error: No existe un producto con el ID:', id);
-                return "El producto que quieres añadir no existe, por favor verifica el ID";
-            };
-            const newCartProduct = cartProducts.map(item => {
-                if (item.id === id) return {...item, quantity: quantity || 1};
-                return item;
-            });
-            await this.#writeCart(cartProducts, JSON.stringify(cartProducts, null, 2), 'utf-8');
-            console.log('Nuevo producto agregado con éxito:', newCartProduct);
-            return {...newCartProduct};
+            const exists = cart.products.some(p => p.product === product);
+            if (exists) {
+                exists.quantity = Number(exists.quantity) + (Number(quantity) || 1);
+            } else {
+                cart.products.push({product, quantity: Number(quantity) || 1});
+            }
+            await this.#writeCart(carts, JSON.stringify(carts, null, 2), 'utf-8');
+            console.log('Nuevo producto agregado con éxito al carrito:', cart);
+            return {...cart};
         } catch (error) {
             console.error('Error al agregar el nuevo producto:', error);
         }
