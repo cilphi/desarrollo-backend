@@ -1,0 +1,38 @@
+import {promises as fsPromises} from 'fs';
+
+//Listado de carritos
+const carts = [
+    {
+        id:"7c2a9f7d-4a6e-4c1b-bc9f-9c8c1a4e3b12",
+        products:[                
+                {
+                    product: "c1b9a7e4-3a4f-4c9a-9f6b-1a2e3d4f5a01",
+                    quantity: 2
+                },
+                {
+                    product: "a4d2c8f1-7b2e-4e6a-8c91-0f3b2e1d9a22",
+                    stock: 4
+                },
+            ]
+    },
+    {
+        id:"f3d1b6a4-8e52-4c9e-9a27-6e0b5f8d92a7",
+        products:[            
+            {
+                product: "9d3a6f2e-5b8c-4e1a-9c2f-7a4b6d8e1a44",
+                quantity: 6
+            },
+        ]
+    }
+];
+
+const writeCartsFile = async () => {
+    try {
+        await fsPromises.writeFile('carts.json', JSON.stringify(carts, null, 2), 'utf-8');
+        console.log('El archivo con los carritos fue creado con éxito.');
+    } catch (error) {
+        console.error('Error al crear el archivo de productos:', error);
+    }
+}
+
+writeCartsFile();
