@@ -1,4 +1,5 @@
 import express from 'express';
+import crypto from 'crypto';
 import { ProductManager } from './src/routes/productManager.js';
 import { CartManager } from './src/routes/cartManager.js';
 
@@ -56,7 +57,7 @@ app.get("/carts/:id",async(req,res)=>{
         const {id} = req.params
         const cartManager = new CartManager("carts.json")
         const cartProduct = await cartManager.getCartById(id)
-        res.json('Carro encontrado:' + cartProduct)
+        res.json({message:'Carro encontrado', cart: cartProduct})
         
     } catch (error) {
         res.json({message:error.message})
@@ -120,7 +121,7 @@ app.post("/carts", async (req, res) => {
 
 app.post("/carts/:id/products/:id",async (req,res)=>{
     try {
-        const { product } = req.params
+        const { cartId, productId } = req.params
         const body = req.body
         if(body.product && typeof body.product !== 'string') {
             res.json({message:"string"})
